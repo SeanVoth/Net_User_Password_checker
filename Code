@@ -1,0 +1,20 @@
+# Check if the file exists
+if (Test-Path $usernamesFile) {
+    # Read the list of usernames from the file
+    $usernames = Get-Content $usernamesFile
+    
+    # Loop through each username and run the net user command
+    foreach ($username in $usernames) {
+        # Runs the net user command and capture specific parts of the output
+        $userInfo = net user $username /domain | Select-String "User name:", "Full Name:", "Password last set:", "Password expires:"
+        
+        # Formats and output the captured information
+        Write-Output "User name: $($userInfo[0].ToString().Split(':')[1].Trim())"
+        Write-Output "Full Name: $($userInfo[1].ToString().Split(':')[1].Trim())"
+        Write-Output "Password last set: $($userInfo[2].ToString().Split(':')[1].Trim())"
+        Write-Output "Password expires: $($userInfo[3].ToString().Split(':')[1].Trim())"
+        Write-Output ""
+    }
+} else {
+    Write-Host "File not found: $usernamesFile"
+}
